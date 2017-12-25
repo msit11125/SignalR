@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+	<meta charset="utf-8" />
+</head>
+<body>
+    目前在線人數:
+    <div id="hitCountValue">0</div>
+
+    <hr />
+    <h2>
+        Hello ~
+    </h2>
+
+
+    <script src="Scripts/jquery-1.6.4.js"></script>
+    <script src="Scripts/jquery.signalR-2.2.1.js"></script>
+    <script src="/signalr/hubs"></script>
+    <script type="text/javascript">
+        $(function () {
+            //3 建立server的連線
+            var connect = $.hubConnection();
+            //Hub Class的名稱
+            var hub = connect.createHubProxy("HitCountHub");
+            //4 接收
+            hub.on("onRecordHit", function (hitcount) {
+                //顯示到頁面
+                $('#hitCountValue').text(hitcount);
+            })
+
+
+
+            //開始
+            connect.start(function () {
+                hub.invoke("RecordHit");
+            });
+        });
+
+    </script>
+</body>
+
+</html>

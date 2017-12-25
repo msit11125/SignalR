@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Page Title</title>
+
+</head>
+<body>
+
+    <h1>CK Editor</h1>
+    <p name="text">CK Editor 測試</p>
+    <textarea name="editor1"></textarea>
+
+    <div name="displayCK" style="margin:2%;padding:2%;border:1px solid #68abd1">
+        可於上方開始輸入...
+    </div>
+    <!--5種模式 basic standard standard-all full full-all-->
+    <script src="//cdn.ckeditor.com/4.6.2/full/ckeditor.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"
+            int123egrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+            crossorigin="anonymous"></script>
+    <script>
+
+        //產生ckEditor
+        var config = {
+            language: 'en',
+            uiColor: '#9AB8F3',
+            toolbar: [
+                        ['Source', '-', 'NewPage', 'Save', 'Preview', '-', 'Templates'],
+                        ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Print', 'SpellChecker', 'Scayt'],
+                        ['Undo', 'Redo', '-', 'Find', 'Replace', '-', 'SelectAll', 'RemoveFormat'],
+                        '/',
+                        ['Bold', 'Italic', 'Underline', 'Strike', '-', 'Subscript', 'Superscript'],
+                        ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', 'Blockquote'],
+                        ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+                        ['Link', 'Unlink', 'Anchor'],
+                        ['Image', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak'],
+                        '/',
+                        ['Styles', 'Format', 'Font', 'FontSize'],
+                        ['TextColor', 'BGColor'],
+                        ['Maximize', 'ShowBlock']
+                     ]
+        }
+        CKEDITOR.replace('editor1', config);
+
+
+
+
+
+        //change事件
+
+        for (var i in CKEDITOR.instances) {
+            CKEDITOR.instances[i].on('change', function () {
+                var htmlText = CKEDITOR.instances.editor1.getData();
+                document.getElementsByName('displayCK')[0].innerHTML = htmlText;
+            });
+        }
+
+    </script>
+</body>
+</html>
