@@ -3,7 +3,7 @@
     ViewBag.Title = "Chat";
 }
 
-<h2 class="alert alert-info">歡樂聊天室</h2>
+<h2 class="title-chatroom">歡樂聊天室</h2>
 <title>SignalR 聊天室</title>
 
 <h4 id="userName">你好！ </h4>
@@ -26,35 +26,48 @@
 
 @section css{
     <style>
+        .title-chatroom {
+            background-color: #2a2a2a;
+            color: white;
+            padding: 10px;
+        }
+
         #userName {
             display: none;
             color: #3465a9;
         }
+
         #messageBox, #chatList {
             float: left;
             height: 500px;
             width: 70%;
             overflow: auto;
         }
+
         #messageBox {
             border: 1px solid #808080;
         }
-        .message{
-            width:100%;
+
+        .message {
+            width: 100%;
         }
+
         #chatList {
             border: 1px solid #808080;
-            margin:0 0 1% 1% ;
+            margin: 0 0 1% 1%;
             width: 29%;
             overflow: scroll;
-            list-style:circle;
+            list-style: circle;
         }
+
         #list li {
             cursor: pointer;
         }
+
         #bar {
             clear: both;
         }
+
         p {
             margin: 0;
         }
@@ -73,7 +86,7 @@
         // ChatObject 聊天功能封裝的物件
         var chatObj = {
             // 在線人數
-            onlineCount: 0, 
+            onlineCount: 0,
             // 製作隨機ID
             makeid: function () {
                 var text = "";
@@ -88,17 +101,60 @@
 
 
         $(function () {
-            var userID = "";//使用者名稱
-            userID = window.prompt("請輸入您的大名：");
-            if (!userID) // !undefine => true
-                userID = "訪客" + chatObj.makeid();
-
-            $("#userName").append(userID).show();
-
-
             //建立與Server端的Hub的物件，注意Hub的開頭字母要為小寫 -> C# Class : ChatHub
             var chat = $.connection.chatHub;
 
+            var userID = "";//使用者名稱
+
+            var dbusername =  @Html.Raw(Json.Encode(ViewBag.UserName));
+
+            userID = "訪客" + chatObj.makeid();
+
+            if(dbusername != ""){
+                userID = dbusername;
+            }
+         
+
+            //將連線打開
+            $.connection.hub.start().done(function () {
+                //當連線完成後，呼叫Server端的userConnected方法，並傳送使用者姓名給Server
+                chat.server.userConnected(userID);
+                $("#userName").append(userID).show();
+
+                //==== 訊息送出 =====
+                $("#send").click(function () {
+                    var pushMsgInput = $(".message");
+                    var toId = $("#box").val();
+                    //判斷是傳給全部人還是密語
+                    if (toId == "all") {
+                        chat.server.send(pushMsgInput.val());//呼叫Server端的send方法，並傳送使用者姓名及訊息內容給Server
+                    } else {
+                        chat.server.sendToSomeOne(toId, pushMsgInput.val());
+                    }
+                    pushMsgInput.val('');
+                });
+
+                $(".message").keypress(function (event) {  //Enter鍵盤事件註冊
+                    if (event.which == 13) {
+                        $("#send").trigger('click');
+                        $(".message").focus();
+                    }
+                });
+                //===================
+
+                ////登出或登入連線關閉
+                //$("#logOffbtn").on('click',function(){
+                //    chat.connection.stop();
+                //});
+                //$("#logInbtn").on('click',function(){
+                //    chat.connection.stop();
+                //});
+            });;
+
+
+
+
+            //--- 建立連線後，我們接著來定義client端的function來讓Server端的hub呼叫。 ---
             //取得所有上線使用者清單
             chat.client.getList = function (userList) {
                 var li = "";
@@ -110,7 +166,6 @@
                 $("#list").html(li);
                 $("#onlineCount").text(chatObj.onlineCount);
             }
-
             //新增一筆上線人員
             chat.client.addList = function (id, name) {
                 var li = "<li id='" + id + "'>" + name + "</li>";
@@ -123,27 +178,14 @@
                 $("#" + id).remove();
                 $("#onlineCount").text(--chatObj.onlineCount);
             }
-
-
-
-
-
-
-
-            //--- 建立連線後，我們接著來定義client端的function來讓Server端的hub呼叫。 ---
-
             //有人初次進聊天室訊息
             chat.client.hello = function (message) {
                 $("#messageList").append("<li>" + message + "</li>");
             }
-
             //全體聊天
             chat.client.sendAll = function (message) {
                 $("#messageList").append("<li>" + message + "</li>");
             }
-
-
-
             //密語聊天
             chat.client.sendToSomeOne = function (message) {
                 $("#messageList").append("<li>" + message + "</li>");
@@ -152,42 +194,12 @@
             chat.client.sendToSomeOneMe = function (message) {
                 $("#messageList").append("<li>" + message + "</li>");
             }
+  
 
 
 
 
-
-
-
-            //將連線打開
-            $.connection.hub.start().done(function () {
-                //當連線完成後，呼叫Server端的userConnected方法，並傳送使用者姓名給Server
-                chat.server.userConnected(userID);
-            });;
-
-
-
-            //==== 訊息送出 =====
-            $("#send").click(function () {
-                var pushMsgInput = $(".message");
-                var toId = $("#box").val();
-                //判斷是傳給全部人還是密語
-                if (toId == "all") {
-                    chat.server.send(pushMsgInput.val());//呼叫Server端的send方法，並傳送使用者姓名及訊息內容給Server
-                } else {
-                    chat.server.sendToSomeOne(toId, pushMsgInput.val());
-                }
-                pushMsgInput.val('');
-            });
-
-            $(".message").keypress(function (event) {  //Enter鍵盤事件註冊
-                if (event.which == 13) {
-                    $("#send").trigger('click');
-                }
-            });
-            //===================
-
-
+           
 
             //加入密語select
             $("#list").on("click", "li", function () {
@@ -201,6 +213,8 @@
                 var option = "<option></option>"
                 $("#box").append(option).find("option:last").val(id).text(text).attr({ "selected": "selected" }).addClass(id);
             });
+
+           
         });
 
     </script>

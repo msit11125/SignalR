@@ -23,7 +23,9 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
+                    <li></li>
                 </ul>
+                @Html.Partial("_LoginPartial")
             </div>
         </div>
     </div>
@@ -34,6 +36,11 @@
             <p>&copy; @DateTime.Now.Year - 我的 SignalR 聊天室</p>
         </footer>
     </div>
+
+    @Html.Partial("_LoginModalPartial")
+
+
+
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")

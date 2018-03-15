@@ -1,0 +1,43 @@
+﻿
+
+@if (Request.IsAuthenticated)
+{
+    using (Html.BeginForm("LogOff", "Home", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    {
+        <li class="btn-group nav">
+            <button type="button" class="btn navbar-btn">@ViewBag.UserName</button>
+            <button type="button" class="btn navbar-btn dropdown-toggle" data-toggle="dropdown">
+                <span class="caret"></span>
+                <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href="#">我的帳號</a></li>
+                <li><a href="#">設定</a></li>
+            </ul>
+        </li>
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <a href="javascript:document.getElementById('logoutForm').submit();" id="logOffbtn">
+                    登出
+                </a>
+            </li>
+        </ul>
+    }
+}
+else
+{
+    <ul class="nav navbar-nav navbar-right">
+        <li>
+            <a href="@Url.Action("Register", "Account")">
+                <span class="glyphicon glyphicon-registration-mark"></span>
+                註冊
+            </a>
+        </li>
+        <li>
+            <a href="#myModal" data-toggle="modal" data-target="#myModal">登入</a>
+        </li>
+    </ul>
+}  
+
+
+
